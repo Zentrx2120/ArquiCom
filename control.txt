@@ -1,0 +1,84 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    12:14:44 02/28/2024 
+-- Design Name: 
+-- Module Name:    control - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity control is
+    Port ( clk : in  STD_LOGIC;
+           clr : in  STD_LOGIC;
+           inicio : in  STD_LOGIC;
+           sd : out  STD_LOGIC_VECTOR (1 downto 0);
+           sr : out  STD_LOGIC_VECTOR (1 downto 0);
+           sel : out  STD_LOGIC);
+end control;
+
+architecture Behavioral of control is
+	type estado is (carga, suma, final);
+	signal edo_pres,edo_sig: estado;
+	
+begin
+
+process(edo_pres,inicio)
+	
+	begin
+	case edo_pres is
+		when carga => sd <= "00";
+		sr <= "00";
+		sel <= '0';
+		if(inicio = '1') then
+			edo_sig <= suma;
+		else edo_sig <= carga;
+		end if;
+		
+		when suma => edo_sig<= final;
+		sd <="00"; 
+		sr <="11";
+		sel <= '1';
+		
+		when others => edo_sig <= final;
+		sd <= "11";
+		sr <= "11";
+		sel<='0';
+		
+		end case;
+end process;
+
+process (clk,clr)
+begin
+
+	if(clr = '1') then
+		edo_pres <= carga;
+	elsif(clk'event and clk='1') then
+		edo_pres <= edo_sig;
+	end if;
+end process;
+
+end Behavioral;
+
